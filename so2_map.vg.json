@@ -1,0 +1,129 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "title": "Sulphur Dioxide Map",
+    "width": 650,
+    "height": 500,
+    "padding": {"top": 0, "left": 0, "right": 0, "bottom": 0},  
+    "data": {
+      "url": "https://raw.githubusercontent.com/ying-tsai-wang/3179/refs/heads/main/allmeasure.csv"
+    },
+    "params": [
+      {
+        "name": "Time_Filter",
+        "value": 6,
+        "bind": {
+          "input": "range",
+          "min": 6,
+          "max": 18,
+          "step": 6,
+          "name": "Hour: "
+        }
+      },
+       {
+        "name": "Date_Selection",
+        "value": 1,
+        "bind": {
+          "input": "range",
+          "min": 1,
+          "max": 27,
+          "step": 13,
+          "name": "Date: "
+        }
+      },
+      {
+        "name": "Month_Selection",
+        "value": 1,
+        "bind": {
+          "input": "range",
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "name": "Month: "
+        }
+      }
+    ],
+    "transform": [
+      {"filter": "hours(datum.time) == Time_Filter"},
+      {"filter": "date(datum.time) == Date_Selection"},
+      {"filter": "month(datum.time)+1 == Month_Selection"},
+      {"filter": "datum.parameter == 'SO2'"}
+      
+    ],
+    "projection": {
+      "type": "mercator",
+      "scale": 30000,
+      "center": [144.85, -37.9]
+    },
+    "layer": [
+      {
+        "data": {
+          "url": "https://raw.githubusercontent.com/ying-tsai-wang/3179/refs/heads/main/vic_localities.json",
+          "format": {
+            "type": "topojson",
+            "feature": "vic_localities"
+          }
+        },
+        "mark": {
+          "type": "geoshape",
+          "fill": "#e0e0e0",  
+          "stroke": "white"
+        }
+      },
+      {
+        "mark": {
+          "type": "circle",
+          "strokeWidth": 1,
+          "stroke": "black",  
+          "opacity": 0.8  
+        },
+        "encoding": {
+          "longitude": {
+            "field": "longitude",
+            "type": "quantitative"
+          },
+          "latitude": {
+            "field": "latitude",
+            "type": "quantitative"
+          },
+          "size": {
+            "field": "value",
+            "type": "quantitative",
+            "scale": {
+              "type": "threshold",
+              "domain": [20,30],
+              "range": [250,600,1000]  
+            }
+          },
+          "color": {
+            "field": "value",
+            "type": "quantitative",
+            "scale": {
+              "domain": [0,20,30],
+              "range": ["white", "darkred"]  
+            },
+            "legend": {
+              "title": "SO2(ppb)"
+            }
+          },
+          "tooltip": [
+            {
+              "field": "location",
+              "type": "nominal",
+              "title": "Location"
+            },
+            {
+              "field": "value",
+              "type": "quantitative",
+              "title": "PM2.5 (ug/m3)",
+              "format": ".2f"
+            },
+            {
+              "field": "time",
+              "type": "temporal",
+              "title": "Date"
+            }
+          ]
+        }
+      }
+    ]
+  }

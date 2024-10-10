@@ -1,0 +1,24 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "title":"All Measurement Average Line Chart",
+    "data": {
+      "url": "https://raw.githubusercontent.com/ying-tsai-wang/3179/refs/heads/main/summary_line.csv"
+    },
+    "vconcat": [
+      {
+        "width": 630,
+        "height": 310,
+        "mark": "line",
+        "encoding": {
+          "x": {
+            "field": "datetime_local",
+            "type": "ordinal",
+            "axis": {"grid": false},
+            "title": "Time"
+          },
+          "y": {"field": "average_value", "type": "quantitative", "axis":{"grid": false}, "title":"Time"},
+          "color":{"field": "measurement_name", "type": "nominal", "title": "Measurement"}
+        }
+      }
+    ]
+  }

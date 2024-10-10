@@ -1,0 +1,17 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "title":"PM10 Box Plot",
+    "width": 650,
+    "height": 500,
+    "data": {"url": "https://raw.githubusercontent.com/ying-tsai-wang/3179/refs/heads/main/complete_pm10.csv"},
+    "mark": {"type": "boxplot", "extent": "min-max"},
+    "encoding": {
+      "y": {"field": "location_name", "type": "nominal","axis":{"grid": false}, "title":"Locations"},
+      "x": {
+        "field": "value",
+        "type": "quantitative",
+        "scale": {"zero": false},
+        "axis" :{"grid": false}
+      }
+    }
+  }
