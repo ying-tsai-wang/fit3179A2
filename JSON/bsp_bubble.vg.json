@@ -1,0 +1,45 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "title":"Black Scatter Particle Bubble Chart",
+    "width": 600,
+    "height": 340,
+    "data": {
+      "url": "https://raw.githubusercontent.com/ying-tsai-wang/3179/refs/heads/main/bsp_bubble.csv"
+    },
+    
+    "mark": "circle",
+    "encoding": {
+      "x": {
+        "field": "distance_to_cbd",
+        "type": "quantitative",
+        "title": "Distance to CBD",
+        "axis": {"grid": false}
+      },
+      "y": {
+        "field": "population_density",
+        "type": "quantitative",
+        "title": "Population Density",
+        "axis": {"grid": false}
+      },
+      "size": {
+        "field": "average_value",
+        "type": "quantitative",
+        "scale": {
+          "domain": [5,10,15],
+          "range": [100,600,1000] 
+        },
+        "title": "Average"
+      },
+      "color": {
+        "field": "location_name",
+        "type": "nominal",
+        "title": "Measurement"
+      },
+      "tooltip": [
+        {"field": "location_name", "type": "nominal"},
+        {"field": "distance_to_cbd", "type": "quantitative", "title": "Distance to CBD"},
+        {"field": "population_density", "type": "quantitative"},
+        {"field": "average_value", "type": "quantitative"}
+      ]
+    }
+  }

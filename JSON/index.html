@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Selector</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <style> 
+        h1 {text-align: center;}
+        .text-box-left, .text-box-right {
+            width: 50%; /* Each box occupies 50% of the width */
+            padding: 20px;
+        }
+        .full-text{
+            width: 100%;
+        }
+        p {
+            font-size: 16px;
+        }
+        .content-wrapper {
+            display: flex; /* Use flexbox to align the two text boxes side by side */
+        }
+
+    </style>
+</head>
+<body>
+    <h1>2023 Melbourne Air Quality </h1>
+    <label for="graphSelector">Choose a measurement:</label>
+    <select id="graphSelector">
+        <option value="pm25_map">PM2.5</option>
+        <option value="pm10_map">PM10</option>
+        <option value="temperature_map">Temperature</option>
+        <option value="bsp_map">Black Scatter Particle</option>
+        <option value="o3_map">O3</option>
+        <option value="no2_map">NO2</option>
+        <option value="so_map">SO</option>
+    </select>
+    <br>
+    <br>
+    <div id="map_plot"></div>
+    <div id="box_plot"></div>
+    <div class="content-wrapper">
+        <div class="text-box-left">
+            <p>
+                Explore Melbourne’s data quality using the map above. Select the measurement you’d like to study from the options at the top. Adjust the time filter using the sliders, and refer to the legend on the right for an explanation of the data marks.
+                <br>
+                Hover over any data point on the map to see the actual measurement values. As you switch between different measurements, the other graphs will update dynamically.
+                
+            </p>
+        </div>
+        <div class="text-box-right">
+            <p>To read a box plot, start by examining the central box, which represents the interquartile range (IQR) and contains the middle 50% of the data. The line inside the box indicates the median value. Whiskers extend from the box to the smallest and largest data points within 1.5 times the IQR from first quartile and third quartile. Any points outside the whiskers are considered outliers and are displayed as individual dots. This plot effectively summarizes the dataset’s distribution, variability, and potential outliers. </p>
+        </div>
+        
+    </div>    
+
+
+    <div id="line_chart"></div>
+    <div id="bubble_chart"></div>
+    <div class="content-wrapper">
+        <div class="text-box-left">
+            <p>
+                The line chart above displays information about the selected measurement. Below it, two vertically stacked line charts are presented, with a smaller chart allowing users to drag and select a specific time period for a more detailed view.            </p>
+        </div>
+        <div class="text-box-right">
+            <p>
+                This is the bubble chart that focuses on the relationship between measurement average values and each location's distance to the central business district while also take the population density into consideration. The size of the circle indicates the value of the measurement for a suburb. 
+                Some measurement will directly display the fact that as the distance to the city decreases the average figure goes up while other measurement may not show anya correlation between air quality and distance to the city. For example, temperature.
+            </p>
+        </div>
+        
+    </div>    
+    <br>
+    <label for="locationSelector">Choose a city for entire data:</label>
+    <select id="locationSelector">
+        <option value="alphington">Alphington</option>
+        <option value="altonaNorth">Altona North</option>
+        <option value="boxHill">Box Hill</option>
+        <option value="brighton">Brighton</option>
+        <option value="brooklyn">Brooklyn</option>
+        <option value="dandenong">Dandenong</option>
+        <option value="footscray">Footscray</option>
+        <option value="geelong">Geelong South</option>
+        <option value="cbd">CBD</option>
+        <option value="melton">Melton</option>
+        <option value="mooroolbark">Mooroolbark</option>
+        <option value="pointCook">Point Cook</option>
+        
+    </select>
+    <br>
+    <div id="location_chart"></div>
+    <div id="summary_chart"></div>
+    <br>
+    
+    
+
+    <script>
+        var pm25_map = "pm25_map.vg.json";
+        var pm10_map = "pm10_map.vg.json";
+        var temperature_map = "temperature_map.vg.json";
+        var bsp_map = "bsp_map.vg.json";
+        var o3_map = "o3_map.vg.json";
+        var no2_map = "no2_map.vg.json";
+        var so_map = "so_map.vg.json";
+
+        var pm25_box = "pm25_box.vg.json"
+        var bsp_box = "bsp_box.vg.json"
+        var temperature_box = 'temperature_box.vg.json';
+        var no2_box= 'no2_box.vg.json';
+        var o3_box='o3_box.vg.json';
+        var pm10_box= 'pm10_box.vg.json';
+        var so2_box= 'so2_box.vg.json'; 
+        
+
+        var pm25_line = "pm25_line.vg.json";
+        var bsp_line = "bsp_line.vg.json";
+        var temperature_line = 'temperature_line.vg.json';
+        var pm10_line = 'pm10_line.vg.json';
+        var so2_line = 'so2_line.vg.json';
+        var o3_line = 'o3_line.vg.json';
+        var no2_line = 'no2_line.vg.json';
+
+        var bsp_bubble = "bsp_bubble.vg.json";
+        var no2_bubble ="no2_bubble.vg.json";
+        var o3_bubble ="o3_bubble.vg.json";
+        var pm10_bubble ="pm10_bubble.vg.json";
+        var pm25_bubble ="pm25_bubble.vg.json";
+        var so2_bubble ="so2_bubble.vg.json";
+        var temperature_bubble ="temperature_bubble.vg.json"; 
+
+        var alphington = 'alphington.vg.json';
+        var altonaNorth = 'altonaNorth.vg.json';
+        var boxHill = 'boxHill.vg.json';
+        var brighton = 'brighton.vg.json';
+        var brooklyn = 'brooklyn.vg.json';
+        var dandenong = 'dandenong.vg.json';
+        var footscray = 'footscray.vg.json';
+        var melton = 'melton.vg.json';
+        var mooroolbark = 'mooroolbark.vg.json';
+        var pointCook = 'pointCook.vg.json';
+        var cbd = 'cbd.vg.json';
+        var geelong = 'geelong.vg.json';
+
+        var summary = 'summary_line.vg.json'
+
+    
+        // Function to load the selected graph for maps
+        function loadGraph(selectedGraph) {
+            var graphFile;
+            var lineChartFile;
+            var boxPlotFile;
+            var bubbleChartFile;
+            var summaryChartFile;
+
+            switch (selectedGraph) {
+                case "pm25_map":
+                    graphFile = pm25_map;
+                    lineChartFile = pm25_line;
+                    boxPlotFile = pm25_box;
+                    bubbleChartFile = pm25_bubble;
+                    break;
+                case "pm10_map":
+                    graphFile = pm10_map;
+                    lineChartFile = pm10_line;
+                    boxPlotFile = pm10_box ;
+                    bubbleChartFile = pm10_bubble;
+                    break;
+                case "temperature_map":
+                    graphFile = temperature_map;
+                    lineChartFile = temperature_line;
+                    boxPlotFile = temperature_box;
+                    bubbleChartFile = temperature_bubble;
+                    break;
+                case "bsp_map":
+                    graphFile = bsp_map;
+                    lineChartFile = bsp_line;
+                    boxPlotFile = bsp_box;
+                    bubbleChartFile = bsp_bubble;
+                    break;
+                case "o3_map":
+                    graphFile = o3_map;
+                    lineChartFile = o3_line;
+                    boxPlotFile = o3_box;
+                    bubbleChartFile = o3_bubble;
+                    break;
+                case "no2_map":
+                    graphFile = no2_map;
+                    lineChartFile = no2_line;
+                    boxPlotFile = no2_box;
+                    bubbleChartFile = no2_bubble;
+                    break;
+                case "so_map":
+                    graphFile = so_map;
+                    lineChartFile = so2_line;
+                    boxPlotFile = so2_box;
+                    bubbleChartFile = so2_bubble;
+                default:
+                    graphFile = pm25_map; 
+                    lineChartFile = pm25_line;
+                    boxPlotFile = pm25_box;
+                    bubbleChartFile = pm25_bubble;
+            }
+    
+            vegaEmbed("#map_plot", graphFile).then(function(result) {
+                // Access the Vega view instance as result.view
+            }).catch(console.error);
+            vegaEmbed("#line_chart", lineChartFile).then(function(result) {
+                // Access the Vega view instance as result.view
+            }).catch(console.error);
+            vegaEmbed("#box_plot", boxPlotFile).then(function(result) {
+                // Access the Vega view instance as result.view
+            }).catch(console.error);
+            vegaEmbed("#bubble_chart", bubbleChartFile).then(function(result) {
+                // Access the Vega view instance as result.view
+            }).catch(console.error);
+            vegaEmbed("#summary_chart", summary).then(function(result) {
+                // Access the Vega view instance as result.view
+            }).catch(console.error);
+
+        }
+        function loadLocation(selectedGraph) {
+            var location_file;
+            switch (selectedGraph) {
+                case "pointCook":
+                    location_file = pointCook;
+                    break;
+                case "alphington":
+                    location_file = alphington;
+                    break;
+                case "altonaNorth":
+                    location_file = altonaNorth;
+                    break;
+                case "boxHill":
+                    location_file = boxHill;
+                    break;
+                case "brighton":
+                    location_file = brighton;
+                    break;
+                case "dandenong":
+                    location_file = dandenong;
+                    break;
+                case "footscray":
+                    location_file = footscray;
+                    break;
+                case "melton":
+                    location_file = melton;
+                    break;
+                case "cbd":
+                    location_file = cbd;
+                    break;
+                case "geelong":
+                    location_file = geelong; 
+                    break;
+                case "mooroolbark":
+                    location_file = mooroolbark;
+                    break;
+                default:
+                    location_file = pointCook; // Fallback to PM2.5 if an unknown value is selected
+            }
+            vegaEmbed("#location_chart", location_file).then(function(result) {
+                // Access the Vega view instance as result.view
+            }).catch(console.error);
+        }
+
+
+
+        // Load the initial graph (default to PM2.5)
+        loadGraph("pm25_map");
+        // Load the initial line chart (default to PM2.5)
+        loadLocation("alphington");
+
+        // Add event listener to selector to load the corresponding graph
+        document.getElementById("graphSelector").addEventListener("change", function() {
+            var selectedGraph = this.value;
+            loadGraph(selectedGraph);
+        });
+
+        document.getElementById("locationSelector").addEventListener("change", function() {
+            var selectedGraph = this.value;
+            loadLocation(selectedGraph);
+        });
+        
+
+
+    </script>
+
+</body>
+</html>
